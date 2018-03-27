@@ -1,5 +1,8 @@
 package com.example.cyber.testone;
 
+import android.content.Intent;
+import android.graphics.pdf.PdfDocument;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -24,8 +27,8 @@ public class MainActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+//                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+//                        .setAction("Action", null).show();
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
@@ -44,7 +47,10 @@ public class MainActivity extends AppCompatActivity {
                         handler.sendMessage(message);
                         Log.d("testone", "backThread finished.");
                     }
-                }).run();
+                }).start();
+                String str = "This is asyncTask.";
+                new MyAsyncTask().execute(str);
+                Log.d("testone", "main thread....");
             }
         });
     }
@@ -53,7 +59,57 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void handleMessage(Message msg) {
             Log.d("testone", msg.getData().toString());
-            Toast.makeText(getApplicationContext(), "handle message done!", Toast.LENGTH_SHORT);
+            Toast.makeText(getApplicationContext(), "handle message done!", Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(MainActivity.this, PageActivity.class);
+            getApplicationContext().startActivity(intent);
         }
     };
+
+    private class MyAsyncTask extends AsyncTask<String, Void, String>{
+        @Override
+        protected void onPreExecute() {
+            Toast.makeText(getApplicationContext(), "onPreExecute!", Toast.LENGTH_SHORT).show();
+        }
+
+        @Override
+        protected void onPostExecute(String o) {
+            Toast.makeText(getApplicationContext(), "onPreExecute!---" + o, Toast.LENGTH_SHORT).show();
+        }
+
+        @Override
+        protected String doInBackground(String... datas) {
+            Log.d("testone", "doInBackground");
+            return datas[0];
+        }
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        Log.d("testone", "onStart()");
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Log.d("testone", "onResume()");
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        Log.d("testone", "onPause()");
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        Log.d("testone", "onStop()");
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        Log.d("testone", "onDestroy()");
+    }
 }
