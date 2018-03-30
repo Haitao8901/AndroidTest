@@ -1,11 +1,16 @@
 package com.example.cyber.testone;
 
+import android.content.ComponentName;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.graphics.pdf.PdfDocument;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.IBinder;
 import android.os.Message;
+import android.os.Messenger;
+import android.os.RemoteException;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
@@ -13,6 +18,8 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
+
+import com.example.cyber.testone.serviceTest.DownloadService;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -27,8 +34,16 @@ public class MainActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-//                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-//                        .setAction("Action", null).show();
+                try {
+                    Message mes = Message.obtain();
+                    mes.replyTo = receiveMessenger;
+                    Bundle bundle = new Bundle();
+                    bundle.putString("msg", "hello service. I am client.");
+                    mes.setData(bundle);
+                    sendMessenger.send(mes);
+                } catch (RemoteException e) {
+                    e.printStackTrace();
+                }
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
@@ -53,7 +68,19 @@ public class MainActivity extends AppCompatActivity {
                 Log.d("testone", "main thread....");
             }
         });
+
+        Intent intent = new Intent(MainActivity.this, DownloadService.class);
+        bindService(intent, conn, BIND_AUTO_CREATE);
     }
+
+    private Messenger receiveMessenger = new Messenger(new Handler(){
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            Bundle bundle = msg.getData();
+            Log.d("<<<<<<<<<<<<<", bundle.getString("msg"));
+        }
+    });
 
     private Handler handler = new Handler(){
         @Override
@@ -82,6 +109,19 @@ public class MainActivity extends AppCompatActivity {
             return datas[0];
         }
     }
+
+    private Messenger sendMessenger = null;
+    private ServiceConnection  conn = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            sendMessenger = new Messenger(service);
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            Log.d(">>>>>>>>>>>","service disconnected.");
+        }
+    };
 
     @Override
     protected void onStart() {
