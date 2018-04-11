@@ -38,34 +38,34 @@ public class MainActivity extends AppCompatActivity {
                     Message mes = Message.obtain();
                     mes.replyTo = receiveMessenger;
                     Bundle bundle = new Bundle();
-                    bundle.putString("msg", "hello service. I am client.");
+                    bundle.putString("msg", "hello service. I am client. What cnt is it now ?");
                     mes.setData(bundle);
                     sendMessenger.send(mes);
                 } catch (RemoteException e) {
                     e.printStackTrace();
                 }
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        Log.d("testone", "backThread running");
-                        for(int i = 0; i < 10; i++){
-                            try {
-                                Thread.sleep(500);
-                            }catch (Exception e){
-
-                            }
-                        }
-                        Message message = handler.obtainMessage();
-                        Bundle data = new Bundle();
-                        data.putString("value", "I'm comming from another thread.");
-                        message.setData(data);
-                        handler.sendMessage(message);
-                        Log.d("testone", "backThread finished.");
-                    }
-                }).start();
-                String str = "This is asyncTask.";
-                new MyAsyncTask().execute(str);
-                Log.d("testone", "main thread....");
+//                new Thread(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        Log.d("testone", "backThread running");
+//                        for(int i = 0; i < 10; i++){
+//                            try {
+//                                Thread.sleep(500);
+//                            }catch (Exception e){
+//
+//                            }
+//                        }
+//                        Message message = handler.obtainMessage();
+//                        Bundle data = new Bundle();
+//                        data.putString("value", "I'm comming from another thread.");
+//                        message.setData(data);
+//                        handler.sendMessage(message);
+//                        Log.d("testone", "backThread finished.");
+//                    }
+//                }).start();
+//                String str = "This is asyncTask.";
+//                new MyAsyncTask().execute(str);
+//                Log.d("testone", "main thread....");
             }
         });
 
@@ -79,6 +79,7 @@ public class MainActivity extends AppCompatActivity {
             super.handleMessage(msg);
             Bundle bundle = msg.getData();
             Log.d("<<<<<<<<<<<<<", bundle.getString("msg"));
+            Log.d("<<<<<<<<<<<<<", "server said current cnt is:---->>>" + bundle.getString("cnt"));
         }
     });
 
@@ -87,8 +88,8 @@ public class MainActivity extends AppCompatActivity {
         public void handleMessage(Message msg) {
             Log.d("testone", msg.getData().toString());
             Toast.makeText(getApplicationContext(), "handle message done!", Toast.LENGTH_SHORT).show();
-            Intent intent = new Intent(MainActivity.this, PageActivity.class);
-            getApplicationContext().startActivity(intent);
+//            Intent intent = new Intent(MainActivity.this, PageActivity.class);
+//            getApplicationContext().startActivity(intent);
         }
     };
 

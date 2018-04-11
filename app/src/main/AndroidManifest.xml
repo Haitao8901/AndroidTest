@@ -37,6 +37,10 @@
             android:label="@string/pagetest"
             android:theme="@style/AppTheme.NoActionBar">
         </activity>
+        <service
+            android:name=".serviceTest.DownloadService">
+
+        </service>
     </application>
 
 </manifest>
