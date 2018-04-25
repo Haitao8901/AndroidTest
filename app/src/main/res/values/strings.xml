@@ -96,4 +96,6 @@
     <string name="listviewtitle">Welcome</string>
     <string name="listviewtext">Sure to commit</string>
     <string name="pagetest">Page Test</string>
+    <string name="fullName">LastName\n\nFirstName</string>
+    <string name="content">Components with responsive elevations may encounter other components as they move between their resting elevations and dynamic elevation offsets.</string>
 </resources>

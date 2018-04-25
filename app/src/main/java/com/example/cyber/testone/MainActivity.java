@@ -1,8 +1,11 @@
 package com.example.cyber.testone;
 
+import android.app.Activity;
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.SharedPreferences;
 import android.graphics.pdf.PdfDocument;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -13,22 +16,28 @@ import android.os.Messenger;
 import android.os.RemoteException;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.view.PagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.example.cyber.testone.serviceTest.DownloadService;
 
-public class MainActivity extends AppCompatActivity {
-
+public class MainActivity extends Activity {
+    private LinearLayout body;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+
+        body = (LinearLayout)findViewById(R.id.body);
+//        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+//        setSupportActionBar(toolbar);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -41,36 +50,19 @@ public class MainActivity extends AppCompatActivity {
                     bundle.putString("msg", "hello service. I am client. What cnt is it now ?");
                     mes.setData(bundle);
                     sendMessenger.send(mes);
+                    addBodyView();
                 } catch (RemoteException e) {
                     e.printStackTrace();
                 }
-//                new Thread(new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        Log.d("testone", "backThread running");
-//                        for(int i = 0; i < 10; i++){
-//                            try {
-//                                Thread.sleep(500);
-//                            }catch (Exception e){
-//
-//                            }
-//                        }
-//                        Message message = handler.obtainMessage();
-//                        Bundle data = new Bundle();
-//                        data.putString("value", "I'm comming from another thread.");
-//                        message.setData(data);
-//                        handler.sendMessage(message);
-//                        Log.d("testone", "backThread finished.");
-//                    }
-//                }).start();
-//                String str = "This is asyncTask.";
-//                new MyAsyncTask().execute(str);
-//                Log.d("testone", "main thread....");
             }
         });
 
         Intent intent = new Intent(MainActivity.this, DownloadService.class);
         bindService(intent, conn, BIND_AUTO_CREATE);
+    }
+
+    private void addBodyView(){
+        body.addView(new BodyView(this));
     }
 
     private Messenger receiveMessenger = new Messenger(new Handler(){
@@ -139,6 +131,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
+        SharedPreferences sp = getSharedPreferences("com.example.cyber.testone", Context.MODE_PRIVATE);
         Log.d("testone", "onPause()");
     }
 
