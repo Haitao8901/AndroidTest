@@ -39,7 +39,7 @@ public class MainActivity extends Activity {
 //        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
 //        setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.leftfab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -54,6 +54,15 @@ public class MainActivity extends Activity {
                 } catch (RemoteException e) {
                     e.printStackTrace();
                 }
+            }
+        });
+
+        FloatingActionButton rfab = (FloatingActionButton) findViewById(R.id.rightfab);
+        rfab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(MainActivity.this, PhotoPickActivity.class);
+                startActivity(intent);
             }
         });
 
