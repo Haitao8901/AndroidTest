@@ -16,12 +16,16 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.view.Display;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Adapter;
 import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
+import android.widget.TextView;
+
+import com.bumptech.glide.Glide;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -33,14 +37,23 @@ import java.util.List;
 
 public class PhotoPickActivity extends Activity {
     private List<ImageModel> images;
-    private Adapter gridView;
+    private Adapter gridViewAdapter;
+    private GridView gridView;
+    private int mScreenHeight, mScreenWidth;
+    private int eachWidth;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.photopicker);
+        Display display = getWindowManager().getDefaultDisplay();
+        mScreenHeight= display.getHeight();
+        mScreenWidth = display.getWidth();
+        eachWidth = (mScreenWidth - 10)/3;
         if(isGrantExternalRW()){
             getImages(this);
+            gridView = findViewById(R.id.gridview);
+            gridView.setAdapter(new GridAdapter());
         }
     }
 
@@ -74,9 +87,10 @@ public class PhotoPickActivity extends Activity {
         private List<ImageModel> images;
         private int selectedCnt;
 
+
         @Override
         public int getCount() {
-            return 0;
+            return 30;
         }
 
         @Override
@@ -89,15 +103,29 @@ public class PhotoPickActivity extends Activity {
             return 0;
         }
 
+
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
-            ImageModel imageModel = this.images.get(position);
+//            ImageModel imageModel = this.images.get(position);
             if (convertView == null) {
                 convertView = getLayoutInflater().inflate(R.layout.griditem, null);
             }
             CustImageView imageview = convertView.findViewById(R.id.imageview);
+            TextView textView = convertView.findViewById(R.id.textview);
             imageview.setOnClickListener(this);
-            loadImage(imageModel.getPath(), imageview);
+//            loadImage(imageModel.getPath(), imageview);\
+            imageview.setImageDrawable(getResources().getDrawable(R.drawable.ic_launcher_background));
+            ViewGroup.LayoutParams params = imageview.getLayoutParams();
+//            if(position == 3){
+//                params.height = eachWidth + 200;
+//            }
+            params.width = eachWidth;
+            imageview.setScaleType(ImageView.ScaleType.FIT_XY);
+            textView.setText(position+"");
+            textView.setTextSize(20);
+//            Glide.with(convertView)
+//                    .load(Uri.parse("http://192.168.0.133:8900/iplatform-ruleeditor/images/icon_unlock.png"))
+//                    .into(imageview);
             return convertView;
         }
 

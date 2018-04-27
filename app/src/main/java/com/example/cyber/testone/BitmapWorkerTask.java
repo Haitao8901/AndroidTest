@@ -5,8 +5,13 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.AsyncTask;
+import android.os.Message;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.lang.ref.WeakReference;
+import java.net.HttpURLConnection;
+import java.net.URL;
 
 /**
  * Created by Cyber on 26/04/2018.
@@ -62,7 +67,7 @@ public class BitmapWorkerTask extends AsyncTask<String, Void, BitmapDrawable> {
         return bmp;
     }
 
-    public static int calculateBitmapSize(BitmapFactory.Options options, int reqWidth, int reqHeight) {
+    public int calculateBitmapSize(BitmapFactory.Options options, int reqWidth, int reqHeight) {
         // Raw height and width of image
         final int height = options.outHeight;
         final int width = options.outWidth;
@@ -81,5 +86,27 @@ public class BitmapWorkerTask extends AsyncTask<String, Void, BitmapDrawable> {
             }
         }
         return inSampleSize;
+    }
+
+    public Bitmap loadNetWorkBitmap(){
+        Bitmap bitmap = null;
+        try {
+            URL url = new URL(path);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("GET");
+            //10 seconds
+            connection.setConnectTimeout(10000);
+            //30 seconds
+            connection.setReadTimeout(30000);
+            int code = connection.getResponseCode();
+            if (code == 200) {
+                InputStream inputStream = connection.getInputStream();
+                bitmap = BitmapFactory.decodeStream(inputStream);
+                inputStream.close();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return bitmap;
     }
 }
