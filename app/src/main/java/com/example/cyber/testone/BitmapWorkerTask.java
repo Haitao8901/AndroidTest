@@ -21,6 +21,7 @@ import java.net.URL;
 public class BitmapWorkerTask extends AsyncTask<String, Void, BitmapDrawable> {
     private boolean complete;
     private String path;
+    private String imageType;
     private int position, width, height;
     private WeakReference<Context> contextReference;
     private WeakReference<CustImageView> imageReference;
@@ -116,7 +117,7 @@ public class BitmapWorkerTask extends AsyncTask<String, Void, BitmapDrawable> {
             //10 seconds
             connection.setConnectTimeout(10000);
             //30 seconds
-            connection.setReadTimeout(30000);
+            connection.setReadTimeout(20000);
             int code = connection.getResponseCode();
             if (code == 200) {
                 InputStream inputStream = connection.getInputStream();

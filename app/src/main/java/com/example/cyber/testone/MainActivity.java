@@ -66,6 +66,15 @@ public class MainActivity extends Activity {
             }
         });
 
+        FloatingActionButton mfab = (FloatingActionButton) findViewById(R.id.middlefab);
+        rfab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(MainActivity.this, Main2Activity.class);
+                startActivity(intent);
+            }
+        });
+
         Intent intent = new Intent(MainActivity.this, DownloadService.class);
         bindService(intent, conn, BIND_AUTO_CREATE);
     }
