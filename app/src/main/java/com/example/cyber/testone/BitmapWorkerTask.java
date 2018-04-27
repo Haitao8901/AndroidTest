@@ -6,6 +6,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.AsyncTask;
 import android.os.Message;
+import android.util.Log;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -18,10 +19,15 @@ import java.net.URL;
  */
 
 public class BitmapWorkerTask extends AsyncTask<String, Void, BitmapDrawable> {
+    private boolean complete;
     private String path;
+    private int position, width, height;
     private WeakReference<Context> contextReference;
     private WeakReference<CustImageView> imageReference;
-    public BitmapWorkerTask(String path, CustImageView imageView, Context context) {
+    public BitmapWorkerTask(int position, int width, int height, String path, CustImageView imageView, Context context) {
+        this.width = width;
+        this.height = height;
+        this.position = position;
         this.path = path;
         this.contextReference = new WeakReference<Context>(context);
         this.imageReference = new WeakReference<CustImageView>(imageView);
@@ -34,7 +40,7 @@ public class BitmapWorkerTask extends AsyncTask<String, Void, BitmapDrawable> {
         }
 
         BitmapDrawable drawable = null;
-        Bitmap bitmap = decodeBitmapFromDisk(path, 150, 150);
+        Bitmap bitmap = decodeBitmapFromDisk(path, width, height);
 
         //Bitmap转换成BitmapDrawable
         if (bitmap != null) {
@@ -49,7 +55,20 @@ public class BitmapWorkerTask extends AsyncTask<String, Void, BitmapDrawable> {
             return;
         }
         CustImageView imageView = imageReference.get();
-        imageView.setImageDrawable(bitmapDrawable);
+        Log.d("======================", "setDrawable to position ==" + this.position + "==");
+        if(imageView != null){
+            imageView.setImageDrawable(bitmapDrawable);
+        }
+
+        this.complete = true;
+    }
+
+    public boolean isComplete() {
+        return complete;
+    }
+
+    public int getPosition() {
+        return position;
     }
 
     public String getPath() {

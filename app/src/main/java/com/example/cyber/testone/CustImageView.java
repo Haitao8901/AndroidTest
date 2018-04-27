@@ -3,6 +3,7 @@ package com.example.cyber.testone;
 import android.content.Context;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.widget.ImageView;
 
 import java.lang.ref.WeakReference;
@@ -21,17 +22,21 @@ public class CustImageView extends ImageView {
         super(context, attrs);
     }
 
-    public boolean checkAndSetTask(BitmapWorkerTask task) {
-        if(taskWeakReference == null){
+    public void checkAndSetTask(int position, int width, int height, String path){
+        Log.d("======================", "checkAndSetTask==" + position + "==" + path);
+        if(taskWeakReference == null || taskWeakReference.get() == null){
+            BitmapWorkerTask task = new BitmapWorkerTask(position,width, height, path, this, this.getContext());
             taskWeakReference = new WeakReference<BitmapWorkerTask>(task);
-            return true;
+            task.execute();
+            return;
         }
         BitmapWorkerTask current = taskWeakReference.get();
-        if(task.getPath().equals(current.getPath())){
-            return false;
+        if(current == null || !path.equals(current.getPath()) || current.isComplete()){
+            BitmapWorkerTask task = new BitmapWorkerTask(position,width, height, path, this, this.getContext());
+            current.cancel(true);
+            this.taskWeakReference = new WeakReference<BitmapWorkerTask>(task);
+            task.execute();
+            return;
         }
-        current.cancel(true);
-        this.taskWeakReference = new WeakReference<BitmapWorkerTask>(task);
-        return true;
     }
 }

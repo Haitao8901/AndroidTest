@@ -51,9 +51,9 @@ public class PhotoPickActivity extends Activity {
         mScreenWidth = display.getWidth();
         eachWidth = (mScreenWidth - 10)/3;
         if(isGrantExternalRW()){
-            getImages(this);
+            images = getImages(this);
             gridView = findViewById(R.id.gridview);
-            gridView.setAdapter(new GridAdapter());
+            gridView.setAdapter(new GridAdapter(images));
         }
     }
 
@@ -87,10 +87,13 @@ public class PhotoPickActivity extends Activity {
         private List<ImageModel> images;
         private int selectedCnt;
 
+        public GridAdapter(List<ImageModel> images) {
+            this.images = images;
+        }
 
         @Override
         public int getCount() {
-            return 30;
+            return images.size();
         }
 
         @Override
@@ -106,26 +109,21 @@ public class PhotoPickActivity extends Activity {
 
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
-//            ImageModel imageModel = this.images.get(position);
+            ImageModel imageModel = this.images.get(position);
             if (convertView == null) {
                 convertView = getLayoutInflater().inflate(R.layout.griditem, null);
             }
             CustImageView imageview = convertView.findViewById(R.id.imageview);
             TextView textView = convertView.findViewById(R.id.textview);
-            imageview.setOnClickListener(this);
-//            loadImage(imageModel.getPath(), imageview);\
+
             imageview.setImageDrawable(getResources().getDrawable(R.drawable.ic_launcher_background));
             ViewGroup.LayoutParams params = imageview.getLayoutParams();
-//            if(position == 3){
-//                params.height = eachWidth + 200;
-//            }
             params.width = eachWidth;
+            params.height = eachWidth;
             imageview.setScaleType(ImageView.ScaleType.FIT_XY);
             textView.setText(position+"");
             textView.setTextSize(20);
-//            Glide.with(convertView)
-//                    .load(Uri.parse("http://192.168.0.133:8900/iplatform-ruleeditor/images/icon_unlock.png"))
-//                    .into(imageview);
+            loadImage(position, eachWidth, eachWidth, imageModel.getPath(), imageview);
             return convertView;
         }
 
@@ -136,11 +134,12 @@ public class PhotoPickActivity extends Activity {
     }
 
 
-    public void loadImage(String path, CustImageView imageView) {
-        BitmapWorkerTask task = new BitmapWorkerTask(path, imageView, this);
-        if (imageView.checkAndSetTask(task)) {
-            task.execute();
-        }
+    public void loadImage(int position, int width, int height, String path, CustImageView imageView) {
+//        BitmapWorkerTask task = new BitmapWorkerTask(position,path, imageView, this);
+//        if (imageView.checkAndSetTask(task)) {
+//            task.execute();
+//        }
+        imageView.checkAndSetTask(position, width, height, path);
     }
 
     public boolean isGrantExternalRW() {
