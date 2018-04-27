@@ -74,6 +74,11 @@ public class Main2Activity extends AppCompatActivity {
             textView.setText(dataItems.get(position).getContent());
             ViewPager viewPager = convertView.findViewById(R.id.viewpager);
             viewPager.setAdapter(new MyPagerAdapter(dataItems.get(position).getImages()));
+            ViewGroup.LayoutParams params = convertView.getLayoutParams();
+            if(params == null){
+                params = new ViewGroup.LayoutParams(mScreenWidth, mScreenHeight/4);
+                convertView.setLayoutParams(params);
+            }
             return convertView;
         }
     }
