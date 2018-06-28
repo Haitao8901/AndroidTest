@@ -1,6 +1,7 @@
 package com.example.cyber.testone.danmu;
 
 import android.content.Context;
+import android.os.Bundle;
 import android.util.AttributeSet;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -52,8 +53,35 @@ import java.util.Set;
         private void init() {
             textCount = itemText.length;
             int duration = (int) ((BARRAGE_GAP_MAX_DURATION - BARRAGE_GAP_MIN_DURATION) * Math.random());
-            mHandler.sendEmptyMessageDelayed(0, duration);
+//            mHandler.sendEmptyMessageDelayed(0, duration);
         }
+
+        public void addBarrage(String text){
+            Message msg = Message.obtain();
+            msg.what = 1;
+            Bundle bundle = new Bundle();
+            bundle.putString("text", text);
+            msg.setData(bundle);
+            mHandler.sendMessageDelayed(msg, 500);
+        }
+
+    class BarrageHandler extends Handler {
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            if(msg.what == 1){
+                Bundle bundle = msg.getData();
+                String text = bundle.getString("text", "Not got the text.");
+                generateItem(text);
+                System.out.println("===============" + text + "===generate============");
+            }
+
+            //每个弹幕产生的间隔时间随机
+//            int duration = (int) ((BARRAGE_GAP_MAX_DURATION - BARRAGE_GAP_MIN_DURATION) * Math.random());
+//            //多个消息可以使用同一个handler, 通过what不同区分不同的消息来源, 从而获取消息内容
+//            this.sendEmptyMessageDelayed(0, duration);
+        }
+    }
 
         @Override
         //Activity生命周期中，onStart, onResume, onCreate都不是真正visible的时间点，真正的visible时间点是onWindowFocusChanged()函数被执行时。
@@ -67,10 +95,14 @@ import java.util.Set;
             totalLine = totalHeight / lineHeight;
         }
 
-        private void generateItem() {
+        private void generateItem(String text) {
             BarrageItem item = new BarrageItem();
-            //把我们的每行弹幕的行数顺序跟弹幕进行一个随机
-            String tx = itemText[(int) (Math.random() * textCount)];
+            String tx = text;
+            if(text == null){
+                //把我们的每行弹幕的行数顺序跟弹幕进行一个随机
+                tx = itemText[(int) (Math.random() * textCount)];
+            }
+            item.text = tx;
             //随机弹幕大小
             int sz = (int) (minSize + (maxSize - minSize) * Math.random());
             item.textView = new TextView(mContext);
@@ -80,7 +112,7 @@ import java.util.Set;
             //这里我们需要传入三个参数 文本对象，文字行数跟大小
             item.textMeasuredWidth=(int) getTextWidth(item, tx, sz);
             //这是设置弹幕移动速度，实现有快有慢的感觉
-            item.moveSpeed = (int) (minSpeed + (maxSpeed - minSpeed) * Math.random());
+            item.moveSpeed = 3000;
 
             //这里为了实现一个弹幕循环播放的项目，在我们实际中看情况而定
             if (totalLine != 0) {
@@ -120,6 +152,7 @@ import java.util.Set;
                 public void onAnimationEnd(Animation animation) {
                     item.textView.clearAnimation();
                     BarrageView.this.removeView(item.textView);
+                    System.out.println("===============" + item.text + "===removed============");
                 }
 
                 @Override
@@ -202,17 +235,6 @@ import java.util.Set;
             return bounds.height();
         }
 
-        class BarrageHandler extends Handler {
-            @Override
-            public void handleMessage(Message msg) {
-                super.handleMessage(msg);
-                generateItem();
-                //每个弹幕产生的间隔时间随机
-                int duration = (int) ((BARRAGE_GAP_MAX_DURATION - BARRAGE_GAP_MIN_DURATION) * Math.random());
-                //多个消息可以使用同一个handler, 通过what不同区分不同的消息来源, 从而获取消息内容
-                this.sendEmptyMessageDelayed(0, duration);
-            }
-        }
         //记录一下当前在显示弹幕的高度，避免弹幕出现重叠
         private Set existMarginValues = new HashSet<>();
         private int linesCount;

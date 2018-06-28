@@ -1,13 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context="com.example.cyber.testone.serviceTest.DanmuActivity">
-    <com.example.cyber.testone.danmu.BarrageView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/barrageView">
-    </com.example.cyber.testone.danmu.BarrageView>
-</android.support.constraint.ConstraintLayout>
+    android:layout_height="match_parent">
+        <com.example.cyber.testone.danmu.BarrageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/barrageView"
+            android:layout_above="@+id/bottomlayout">
+        </com.example.cyber.testone.danmu.BarrageView>
+
+        <LinearLayout
+            android:id="@+id/bottomlayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:orientation="horizontal">
+
+            <EditText
+                android:id="@+id/comment"
+                android:layout_width="0dp"
+                android:layout_weight="1.0"
+                android:layout_height="40dp"
+                android:imeOptions="actionSend"
+                android:background="@color/colorPrimary"
+                android:textColor="@color/colorWhite"
+                android:hint="aaaaaaaaa"
+                android:inputType="text" />
+
+            <ImageView
+                android:id="@+id/send"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:src="@mipmap/ic_launcher"/>
+        </LinearLayout>
+</RelativeLayout>
