@@ -24,17 +24,30 @@ import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.cyber.testone.serviceTest.DanmuActivity;
 import com.example.cyber.testone.serviceTest.DownloadService;
+
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 
 public class MainActivity extends Activity {
     private LinearLayout body;
+    private TextView timeview,timeview1 ;
+
+    public MainActivity() {
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        timeview = (TextView) findViewById(R.id.timeview);
+        timeview1 = (TextView) findViewById(R.id.timeview1);
         body = (LinearLayout)findViewById(R.id.body);
 //        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
 //        setSupportActionBar(toolbar);
@@ -70,7 +83,7 @@ public class MainActivity extends Activity {
         rfab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(MainActivity.this, Main2Activity.class);
+                Intent intent = new Intent(MainActivity.this, DanmuActivity.class);
                 startActivity(intent);
             }
         });
@@ -143,7 +156,32 @@ public class MainActivity extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm a");
+        long milliseconds = System.currentTimeMillis();
+        Date date = new Date(milliseconds);
+        timeview.setText(sdf.format(date));
+        System.out.println("============" + sdf.format(date) + "==========");
+
+        Timetest test = new Timetest();
+        long times = test.getMilliseconds();
+        Date date1 = new Date(times);
+        timeview1.setText(sdf.format(date1));
+
+        Calendar ca = Calendar.getInstance();
+        System.out.println(ca.getTimeZone());
         Log.d("testone", "onResume()");
+    }
+
+    private class Timetest{
+        long milliseconds = 1525773284253L;
+
+        public long getMilliseconds() {
+            return milliseconds;
+        }
+
+        public void setMilliseconds(long milliseconds) {
+            this.milliseconds = milliseconds;
+        }
     }
 
     @Override
