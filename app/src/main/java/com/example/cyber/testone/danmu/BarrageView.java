@@ -111,6 +111,7 @@ import java.util.Set;
             item.textView.setTextColor(Color.rgb(random.nextInt(256), random.nextInt(256), random.nextInt(256)));
             //这里我们需要传入三个参数 文本对象，文字行数跟大小
             item.textMeasuredWidth=(int) getTextWidth(item, tx, sz);
+            item.textMeasuredHeight=(int) getTextHeight(item,tx, sz);
             //这是设置弹幕移动速度，实现有快有慢的感觉
             item.moveSpeed = 3000;
 
@@ -126,43 +127,106 @@ import java.util.Set;
             //弹幕在y轴上出现的位置
             item.verticalPos = random.nextInt(totalLine) * lineHeight;
 //        itemList.add(item);
-            showBarrageItem(item);
+            showBarrageItem(item, true);
         }
 
-        private void showBarrageItem(final BarrageItem item) {
+        private void showBarrageItem(final BarrageItem item, boolean vertical) {
 //paddingLeft是设置布局里面的内容左边的距离，这样我们这就可以让这个弹幕的textview完全消失
-            int leftMargin = this.getRight() - this.getLeft() - this.getPaddingLeft();
+
 //这里我们通过动态的方式去设置一些我们布局的属性。
 //        int verticalMargin = getRandomTopMargin();
 //        item.textView.setTag(verticalMargin);
+            if(!vertical){
+                int leftMargin = this.getRight() - this.getLeft() - this.getPaddingLeft();
+                LayoutParams params = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+                params.addRule(RelativeLayout.ALIGN_PARENT_TOP);
+                params.topMargin = item.verticalPos;
+                this.addView(item.textView, params);
 
-            LayoutParams params = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
-            params.addRule(RelativeLayout.ALIGN_PARENT_TOP);
-            params.topMargin = item.verticalPos;
-            this.addView(item.textView, params);
+                Animation anim = generateTranslateAnim(item, leftMargin);
+                anim.setAnimationListener(new Animation.AnimationListener() {
+                    @Override
+                    public void onAnimationStart(Animation animation) {
 
-            Animation anim = generateTranslateAnim(item, leftMargin);
-            anim.setAnimationListener(new Animation.AnimationListener() {
-                @Override
-                public void onAnimationStart(Animation animation) {
+                    }
+                    @Override
+                    //当我们动画结束的时候，清除该条弹幕
+                    public void onAnimationEnd(Animation animation) {
+                        item.textView.clearAnimation();
+                        BarrageView.this.removeView(item.textView);
+                        System.out.println("===============" + item.text + "===removed============");
+                    }
 
-                }
-                @Override
-                //当我们动画结束的时候，清除该条弹幕
-                public void onAnimationEnd(Animation animation) {
-                    item.textView.clearAnimation();
-                    BarrageView.this.removeView(item.textView);
-                    System.out.println("===============" + item.text + "===removed============");
-                }
+                    @Override
+                    //动画被取消的时候出发
+                    public void onAnimationRepeat(Animation animation) {
 
-                @Override
-                //动画被取消的时候出发
-                public void onAnimationRepeat(Animation animation) {
+                    }
+                });
+                item.textView.startAnimation(anim);
+            }else{
+                int bottomMargin = this.getBottom() - this.getTop() - this.getPaddingBottom();
+                LayoutParams params = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+                params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+                this.addView(item.textView, params);
 
-                }
-            });
-            item.textView.startAnimation(anim);
+                Animation anim = generateVerticalAnim(item, bottomMargin);
+                anim.setAnimationListener(new Animation.AnimationListener() {
+                    @Override
+                    public void onAnimationStart(Animation animation) {
+
+                    }
+                    @Override
+                    //当我们动画结束的时候，清除该条弹幕
+                    public void onAnimationEnd(Animation animation) {
+                        item.textView.clearAnimation();
+                        BarrageView.this.removeView(item.textView);
+                        System.out.println("===============" + item.text + "===removed============");
+                    }
+
+                    @Override
+                    //动画被取消的时候出发
+                    public void onAnimationRepeat(Animation animation) {
+
+                    }
+                });
+                item.textView.startAnimation(anim);
+            }
         }
+
+    private TranslateAnimation generateVerticalAnim(BarrageItem item, int bottomMargin) {
+        //这里我们有四个参数（动画开始的x点，结束点，开始y轴点，结束的y点）
+        TranslateAnimation anim = new TranslateAnimation(0, 0, 0, 0-bottomMargin);
+        //我们设置动画的持续时间，弹幕移动多久，我们就持续多久动画
+        anim.setDuration(item.moveSpeed);
+        // Interpolator 被用来修饰动画效果，定义动画的变化率，可以使存在的动画效果accelerated(加速)，decelerated(减速),repeated(重复),bounced(弹跳)等。
+        /*
+         * AccelerateDecelerateInterpolator 在动画开始与结束的地方速率改变比较慢，在中间的时候加速
+          AccelerateInterpolator  在动画开始的地方速率改变比较慢，然后开始加速
+              AnticipateInterpolator 开始的时候向后然后向前甩
+          AnticipateOvershootInterpolator 开始的时候向后然后向前甩一定值后返回最后的值
+              BounceInterpolator   动画结束的时候弹起
+            CycleInterpolator 动画循环播放特定的次数，速率改变沿着正弦曲线
+          DecelerateInterpolator 在动画开始的地方快然后慢
+            LinearInterpolator   以常量速率改变
+            OvershootInterpolator    向前甩一定值后再回到原来位置
+         * */
+        anim.setInterpolator(new AccelerateDecelerateInterpolator());
+        /*
+         * fillBefore是指动画结束时画面停留在此动画的第一帧;
+           fillAfter是指动画结束是画面停留在此动画的最后一帧。
+       Java代码设置如下：
+      /*****动画结束时，停留在最后一帧*********
+          setFillAfter(true);
+          setFillBefore(false);
+    /*****动画结束时，停留在第一帧*********
+       setFillAfter(false);
+        setFillBefore(true);
+         *
+         * */
+        anim.setFillAfter(true);
+        return anim;
+    }
 
         //
         private TranslateAnimation generateTranslateAnim(BarrageItem item, int leftMargin) {
@@ -215,6 +279,15 @@ import java.util.Set;
             paint.getTextBounds(text, 0, text.length(), bounds);
             return bounds.width();
         }
+
+    public float getTextHeight(BarrageItem item, String text, float Size) {
+        Rect bounds = new Rect();
+        TextPaint paint;
+        paint = item.textView.getPaint();
+        //这里参数是获取文本对象，开始的长度，结束的长度，我们绘制好的矩形框
+        paint.getTextBounds(text, 0, text.length(), bounds);
+        return bounds.height();
+    }
 
 
         /**
@@ -275,5 +348,6 @@ import java.util.Set;
         public int moveSpeed;//移动速度
         public int verticalPos;//垂直方向显示的位置
         public int textMeasuredWidth;//字体显示占据的宽度
+        public int textMeasuredHeight;//字体显示占据的宽度
     }
 }
